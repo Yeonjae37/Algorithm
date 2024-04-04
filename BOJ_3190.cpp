@@ -12,7 +12,7 @@ int calc(queue <pair <int, int>> Q, list<pair <int, int>> apple, list<pair <int,
   direction.second = 0;
 
   int dx[4] = {0, 1, 0, -1}; //우하좌상 (D기준 방향->)
-  int dy[4] = {1, 0, -1, 0};
+  int dy[4] = {1, 0, -1, 0}; 
 
   bool conflict = false; //충돌 여부 저장
   while (!conflict){
