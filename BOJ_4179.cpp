@@ -1,119 +1,66 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define X first
+#define Y second
+
+string board[1002];
+int fire[1002][1002];
+int jihoon[1002][1002];
+int n, m;
+int dx[4] = {1,0,-1,0};
+int dy[4] = {0,1,0,-1};
 
 int main(void){
-  int R, C; //R은 행(세로), C는 열(가로)
-  cin >> R;
-  cin >> C;
-  bool escape = false;
-  queue<pair<int,int>> fire; //불의 초기 위치를 저장해놓을 큐
+  cin.tie(0);
+  cin >> n >> m;
+  for (int i = 0; i < n; i++){
+    fill(fire[i], fire[i]+m, -1);
+    fill(jihoon[i], jihoon[i]+m, -1);
+  }
+  for (int i = 0; i < n; i++) cin >> board[i];
+
+  queue<pair<int,int>> F;
   queue<pair<int,int>> J;
-
-  vector<vector<char>> maze(R, vector<char>(C, 0)); //원본
-  vector<vector<int>> visit(R, vector<int>(C, 0)); //숫자로 저장
-  vector<vector<int>> Jvisit(R, vector<int>(C, 0)); //숫자로 저장
-
-  for (int i = 0; i < R; i++){
-    for (int j = 0; j < C; j++){
-      cin >> maze[i][j];
-      if (maze[i][j] == '#') {
-        visit[i][j] = -2;
-        Jvisit[i][j] = -2;
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < m; j++){
+      if(board[i][j] == 'F'){
+        F.push({i,j});
+        fire[i][j] = 0;
       }
-      if (maze[i][j] == 'F') {
-        fire.push({i, j}); //F이면, 불의 초기 위치 저장
-        visit[i][j] = 0;
-        Jvisit[i][j] = -1;
-      }
-      if (maze[i][j] == '.') {
-        visit[i][j] = -1;
-        Jvisit[i][j] = -1;
-      }
-      if (maze[i][j] == 'J') {
-        J.push({i, j});
-        visit[i][j] = -1;
-        Jvisit[i][j] = 0;
+      if(board[i][j] == 'J'){
+        J.push({i,j});
+        jihoon[i][j] = 0;
       }
     }
   }
 
-  /*for (int i = 0; i < R; i++){
-    for (int j = 0; j < C; j++){
-      cout << visit[i][j] << " ";
-    }
-    cout << endl;
-  }
-  cout << endl;
-
-  for (int i = 0; i < R; i++){
-    for (int j = 0; j < C; j++){
-      cout << Jvisit[i][j] << " ";
-    }
-    cout << endl;
-  }
-  cout << endl;*/
-
-  int dx[4] = {1, 0, -1, 0};
-  int dy[4] = {0, 1 , 0, -1};
-
-  while (!fire.empty()){
-    pair<int, int> cur = fire.front(); fire.pop();
-    
-    for (int i = 0; i < 4; i++){
-      int nx = cur.first + dx[i];
-      int ny = cur.second + dy[i];
-
-      if (nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
-      if (visit[nx][ny] == -2) continue;
-      if (visit[nx][ny] == -1){
-        visit[nx][ny] = visit[cur.first][cur.second] + 1;
-        fire.push({nx, ny});
-      }
+  //불에 대한 BFS
+  while(!F.empty()){
+    auto cur = F.front(); F.pop();
+    for(int dir = 0; dir < 4; dir++){
+      int nx = cur.X + dx[dir];
+      int ny = cur.Y + dy[dir];
+      if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+      if(fire[nx][ny] >= 0 || board[nx][ny] == '#') continue;
+      fire[nx][ny] = fire[cur.X][cur.Y] + 1;
+      F.push({nx,ny});
     }
   }
-  /*for (int i = 0; i < R; i++){
-    for (int j = 0; j < C; j++){
-      cout << visit[i][j] << " ";
-    }
-    cout << endl;
-  }
-  cout << endl;*/
-
-  int min;
 
   while(!J.empty()){
-    pair<int, int> cur = J.front(); J.pop();
-    cout << cur.first << " " << cur.second << endl;
-    for (int i = 0; i < R; i++){
-      for (int j = 0; j < C; j++){
-        cout << Jvisit[i][j] << " ";
-        }
-        cout << endl;
+    auto cur = J.front(); J.pop();
+    for(int dir = 0; dir < 4; dir++){
+      int nx = cur.X + dx[dir];
+      int ny = cur.Y + dy[dir];
+      if (nx < 0 || nx >= n || ny < 0 || ny >= m){
+        cout << jihoon[cur.X][cur.Y]+1;
+        return 0;
       }
-      cout << endl;
-    for (int i = 0; i < 4; i++){
-      int nx = cur.first + dx[i];
-      int ny = cur.second + dy[i];
-
-      if (nx < 0 || nx >= R || ny < 0 || ny >= C){
-        cout << cur.first << " " << cur.second << endl; 
-        min = Jvisit[cur.first][cur.second] + 1;
-        break;
-      }
-
-      if (Jvisit[nx][ny] > -2 && Jvisit[nx][ny] > visit[nx][ny]) {
-        min = 0;
-        break;
-      }
-      
-      if (Jvisit[nx][ny] > -2 && Jvisit[nx][ny] <= visit[nx][ny]){
-        if (Jvisit[nx][ny] <= -1){
-          Jvisit[nx][ny] = Jvisit[cur.first][cur.second] + 1;
-          J.push({nx, ny});
-        }
-      }
+      if (jihoon[nx][ny] >= 0 || board[nx][ny] == '#') continue;
+      if (fire[nx][ny] != -1 && fire[nx][ny] <= jihoon[cur.X][cur.Y]+1) continue;
+      jihoon[nx][ny] = jihoon[cur.X][cur.Y]+1;
+      J.push({nx,ny});
     }
   }
-  if (min == 0) cout << "IMPOSSIBLE" << endl;
-  else cout << min << endl;
+  cout << "IMPOSSIBLE";
 }
