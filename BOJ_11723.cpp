@@ -6,7 +6,7 @@ int S[20];
 int main(void){
   ios::sync_with_stdio(0);
   cin.tie(0);
-  
+
   string str;
   int m;
   cin >> m;
