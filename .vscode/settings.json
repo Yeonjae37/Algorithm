@@ -9,6 +9,13 @@
     "ostream": "cpp",
     "queue": "cpp",
     "set": "cpp",
-    "ios": "cpp"
+    "ios": "cpp",
+    "stack": "cpp",
+    "__split_buffer": "cpp",
+    "array": "cpp",
+    "deque": "cpp",
+    "forward_list": "cpp",
+    "string": "cpp",
+    "string_view": "cpp"
   }
 }
